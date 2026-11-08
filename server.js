@@ -161,11 +161,12 @@ module.exports = db;
 // ==========================================
 // CRÉATION DES TABLES (Cahier des charges)
 // ==========================================
-db.serialize(() => {
-    db.run('PRAGMA foreign_keys = ON');
+// Activation des clés étrangères
+db.pragma('foreign_keys = ON');
 
-    // 1. Table des Utilisateurs globaux (Admin, Étudiants, Enseignants, Validateurs)
-    db.run(`CREATE TABLE IF NOT EXISTS users (
+// Création de toutes les tables de la base de données
+db.exec(`
+    CREATE TABLE IF NOT EXISTS users (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         username TEXT UNIQUE NOT NULL,
         password TEXT NOT NULL,
@@ -178,17 +179,15 @@ db.serialize(() => {
         niveau TEXT,
         specialite TEXT,
         created_at DATETIME DEFAULT CURRENT_TIMESTAMP
-    )`);
+    );
 
-    // 2. Table des Spécialités (L3, 4ING, M2, 5ING)
-    db.run(`CREATE TABLE IF NOT EXISTS specialites (
+    CREATE TABLE IF NOT EXISTS specialites (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         niveau TEXT NOT NULL,
         nom_specialite TEXT NOT NULL
-    )`);
+    );
 
-    // 3. Table des Étudiants (Importés via Excel)
-    db.run(`CREATE TABLE IF NOT EXISTS etudiants_import (
+    CREATE TABLE IF NOT EXISTS etudiants_import (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         annee_universitaire TEXT NOT NULL,
         niveau TEXT NOT NULL,
@@ -201,10 +200,9 @@ db.serialize(() => {
         prenom TEXT NOT NULL,
         section TEXT,
         groupe TEXT
-    )`);
+    );
 
-    // 4. Table des Enseignants (Importés via Excel)
-    db.run(`CREATE TABLE IF NOT EXISTS enseignants_import (
+    CREATE TABLE IF NOT EXISTS enseignants_import (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         annee_universitaire TEXT NOT NULL,
         nom TEXT NOT NULL,
@@ -214,10 +212,9 @@ db.serialize(() => {
         max_groupes_l3 INTEGER DEFAULT 0,
         max_groupes_4ing INTEGER DEFAULT 0,
         max_groupes_m2_5ing INTEGER DEFAULT 2
-    )`);
+    );
 
-    // 5. Table des Groupes de projets
-    db.run(`CREATE TABLE IF NOT EXISTS groupes (
+    CREATE TABLE IF NOT EXISTS groupes (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         annee_universitaire TEXT NOT NULL,
         niveau TEXT NOT NULL,
@@ -228,20 +225,18 @@ db.serialize(() => {
         statut_sujet TEXT DEFAULT 'en_attente' CHECK(statut_sujet IN ('en_attente', 'valide', 'invalide')),
         enseignant_id INTEGER,
         FOREIGN KEY(enseignant_id) REFERENCES enseignants_import(id)
-    )`);
+    );
 
-    // 6. Table des Membres du groupe (Liaison Groupe <-> Étudiants)
-    db.run(`CREATE TABLE IF NOT EXISTS groupe_membres (
+    CREATE TABLE IF NOT EXISTS groupe_membres (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         groupe_id INTEGER NOT NULL,
         etudiant_id INTEGER NOT NULL UNIQUE,
         role_dans_groupe TEXT DEFAULT 'membre' CHECK(role_dans_groupe IN ('chef_groupe', 'membre')),
         FOREIGN KEY(groupe_id) REFERENCES groupes(id) ON DELETE CASCADE,
         FOREIGN KEY(etudiant_id) REFERENCES etudiants_import(id) ON DELETE CASCADE
-    )`);
+    );
 
-    // 7. Table des Sujets Internes (Proposés par les enseignants)
-    db.run(`CREATE TABLE IF NOT EXISTS sujets_internes (
+    CREATE TABLE IF NOT EXISTS sujets_internes (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         annee_universitaire TEXT NOT NULL,
         enseignant_id INTEGER NOT NULL,
@@ -251,10 +246,10 @@ db.serialize(() => {
         description TEXT,
         capacite_max INTEGER DEFAULT 1,
         FOREIGN KEY(enseignant_id) REFERENCES enseignants_import(id) ON DELETE CASCADE
-    )`);
+    );
+`);
 
-    console.log('Toutes les tables de la base de données sont prêtes.');
-});
+console.log('Toutes les tables de la base de données sont prêtes.');
 
 // Protection des API selon le rôle connecté.
 app.use('/api/admin', requireAuth, requireAdmin);
