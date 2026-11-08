@@ -1,0 +1,1541 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Plateforme PFE - Université de Blida 1</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root { --primary-color: #004d40; --secondary-color: #00796b; }
+        body { background-color: #f4f6f9; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        .navbar-custom { background-color: var(--primary-color); }
+        .card-custom { border-radius: 10px; border: none; box-shadow: 0 4px 6px rgba(0,0,0,0.08); }
+        .sidebar { background-color: #ffffff; min-height: calc(100vh - 56px); border-right: 1px solid #dee2e6; }
+        .nav-link.active { background-color: var(--secondary-color) !important; color: white !important; }
+        .badge-status { font-size: 0.85rem; padding: 0.4em 0.6em; }
+
+        #authTab .nav-link {
+            background-color: transparent !important;
+            color: #555 !important;
+            border: none;
+            border-bottom: 2px solid transparent;
+            font-weight: 600;
+            border-radius: 0;
+        }
+        #authTab .nav-link.active {
+            color: var(--primary-color) !important;
+            border-bottom: 3px solid var(--primary-color) !important;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header -->
+    <nav class="navbar navbar-expand-lg navbar-dark navbar-custom px-3">
+        <a class="navbar-brand fw-bold" href="#"><i class="fas fa-university me-2"></i>PFE Manager - Blida 1</a>
+        <div class="ms-auto d-flex align-items-center text-white" id="userInfo" style="display: none;">
+            <span class="me-3" id="userDisplayName"></span>
+            <button class="btn btn-outline-light btn-sm" onclick="logout()"><i class="fas fa-sign-out-alt me-1"></i>Déconnexion</button>
+        </div>
+    </nav>
+
+    <div class="container-fluid">
+        <!-- Section Authentification -->
+        <div id="authSection" class="row justify-content-center mt-5">
+            <div class="col-md-5">
+                <div class="card card-custom p-4">
+                    <ul class="nav nav-tabs nav-justified mb-3" id="authTab" role="tablist">
+                        <li class="nav-item">
+                            <button class="nav-link active" id="login-tab" data-bs-toggle="tab" data-bs-target="#loginPane">Connexion</button>
+                        </li>
+                        <li class="nav-item">
+                            <button class="nav-link" id="register-tab" data-bs-toggle="tab" data-bs-target="#registerPane">Inscription</button>
+                        </li>
+                    </ul>
+                    
+                    <div class="tab-content">
+                        <!-- Connexion -->
+                        <div class="tab-pane fade show active" id="loginPane">
+                            <form id="loginForm">
+                                <div class="mb-3">
+                                    <label class="form-label">Nom d'utilisateur</label>
+                                    <input type="text" id="loginUsername" class="form-control" required placeholder="ex: admin ou matricule">
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Mot de passe</label>
+                                    <input type="password" id="loginPassword" class="form-control" required placeholder="••••••••">
+                                </div>
+                                <button type="submit" class="btn btn-primary w-100" style="background-color: var(--primary-color);">Se connecter</button>
+                            </form>
+                        </div>
+
+                        <!-- Inscription -->
+                        <div class="tab-pane fade" id="registerPane">
+                            <form id="registerForm">
+                                <div class="mb-2">
+                                    <label class="form-label">Rôle</label>
+                                    <select id="regRole" class="form-select" onchange="toggleRegisterFields()" required>
+                                        <option value="student">Étudiant</option>
+                                        <option value="teacher">Enseignant</option>
+                                    </select>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-6 mb-2">
+                                        <label class="form-label">Nom</label>
+                                        <input type="text" id="regNom" class="form-control" required>
+                                    </div>
+                                    <div class="col-md-6 mb-2">
+                                        <label class="form-label">Prénom</label>
+                                        <input type="text" id="regPrenom" class="form-control" required>
+                                    </div>
+                                </div>
+                                <div class="mb-2">
+                                    <label class="form-label">Email</label>
+                                    <input type="email" id="regEmail" class="form-control" required>
+                                </div>
+                                <div class="mb-2">
+                                    <label class="form-label">Nom d'utilisateur</label>
+                                    <input type="text" id="regUsername" class="form-control" required>
+                                </div>
+                                <div id="studentFields">
+                                    <div class="mb-2">
+                                        <label class="form-label">Matricule Étudiant</label>
+                                        <input type="text" id="regMatricule" class="form-control">
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-6 mb-2">
+                                            <label class="form-label">Niveau</label>
+                                            <select id="regNiveau" class="form-select">
+                                                <option value="L3">L3</option>
+                                                <option value="4ING">4ING</option>
+                                                <option value="Master 2">Master 2</option>
+                                                <option value="5ING">5ING</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-6 mb-2">
+                                            <label class="form-label">Spécialité</label>
+                                            <select id="regSpecialite" class="form-select"><option value="">Choisir une spécialité</option></select>
+                                        </div>
+                                    </div>
+                                </div>
+                                <button type="submit" class="btn btn-success w-100 mt-2">Soumettre la demande</button>
+                            </form>
+                        </div>
+                    </div>
+                    <div class="border rounded p-3 mt-3">
+                        <h6>Vérification de l’adresse e-mail</h6>
+                        <input id="verifyEmailAddress" type="email" class="form-control mb-2" placeholder="Adresse e-mail utilisée à l'inscription">
+                        <input id="verifyEmailCode" class="form-control mb-2" placeholder="Code reçu par e-mail">
+                        <button class="btn btn-outline-success btn-sm" onclick="verifyRegistrationEmail()">Vérifier l'adresse</button>
+                        <hr><h6>Définir le mot de passe définitif</h6>
+                        <input id="tempUsername" class="form-control mb-2" placeholder="Nom d'utilisateur">
+                        <input id="tempPassword" type="password" class="form-control mb-2" placeholder="Mot de passe temporaire reçu par e-mail">
+                        <input id="newPassword" type="password" class="form-control mb-2" placeholder="Nouveau mot de passe (10 caractères minimum)">
+                        <button class="btn btn-outline-primary btn-sm" onclick="changeTemporaryPassword()">Changer le mot de passe</button>
+                    </div>
+                    <div id="authAlert" class="mt-3"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section Dashboard -->
+        <div id="dashboardSection" class="row" style="display: none;">
+            <div class="col-md-2 sidebar p-3">
+                <div class="nav flex-column nav-pills" id="v-pills-tab" role="tablist"></div>
+            </div>
+
+            <div class="col-md-10 p-4">
+                <div id="alertContainer"></div>
+                
+                <div class="tab-content" id="v-pills-tabContent">
+                    
+                    <!-- VUE ADMIN 1 : Niveaux & Spécialités -->
+                    <div class="tab-pane fade" id="view-admin-specialites">
+                        <h4 class="fw-bold"><i class="fas fa-layer-group me-2"></i>Gestion des Niveaux & Spécialités</h4>
+                        <hr>
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="card card-custom p-3">
+                                    <h5>Ajouter une Spécialité</h5>
+                                    <form id="addSpecialiteForm">
+                                        <div class="mb-2">
+                                            <label>Niveau d'étude</label>
+                                            <select id="specNiveau" class="form-select" required>
+                                                <option value="L3">L3</option>
+                                                <option value="4ING">4ING</option>
+                                                <option value="Master 2">Master 2</option>
+                                                <option value="5ING">5ING</option>
+                                            </select>
+                                        </div>
+                                        <div class="mb-2">
+                                            <label>Nom de la Spécialité</label>
+                                            <input type="text" id="specNom" class="form-control" required placeholder="ex: SIQ, ISIL, SIT, BIO">
+                                        </div>
+                                        <button type="submit" class="btn btn-primary btn-sm w-100 mt-2">Enregistrer</button>
+                                    </form>
+                                </div>
+                            </div>
+                            <div class="col-md-8">
+                                <div class="card card-custom p-3">
+                                    <h5>Liste des Niveaux et Spécialités définis</h5>
+                                    <table class="table table-bordered table-striped bg-white align-middle">
+                                        <thead>
+                                            <tr><th>Niveau</th><th>Spécialité</th><th>Actions</th></tr>
+                                        </thead>
+                                        <tbody id="specialitesTable"></tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- VUE ADMIN 2 : Consultation & Filtrage Étudiants -->
+                    <div class="tab-pane fade" id="view-admin-students">
+                        <h4 class="fw-bold"><i class="fas fa-user-graduate me-2"></i>Liste des Étudiants</h4>
+                        <hr>
+                        <div class="card card-custom p-3 mb-3">
+                            <div class="row g-2">
+                                <div class="col-md-3">
+                                    <select id="filterStNiveau" class="form-select" onchange="filterStudents()">
+                                        <option value="">Tous les niveaux</option>
+                                        <option value="L3">L3</option><option value="4ING">4ING</option><option value="Master 2">Master 2</option><option value="5ING">5ING</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-3">
+                                    <input type="text" id="filterStSpec" class="form-control" placeholder="Filtrer par spécialité..." oninput="filterStudents()">
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="input-group">
+                                        <input type="text" id="filterStSearch" class="form-control" placeholder="Rechercher par nom, prénom ou matricule..." oninput="filterStudents()">
+                                        <button class="btn btn-outline-secondary" type="button" onclick="filterStudents()"><i class="fas fa-search"></i></button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card card-custom p-3">
+                            <table class="table table-bordered table-striped bg-white align-middle">
+                                <thead>
+                                    <tr><th>Matricule</th><th>Nom & Prénom</th><th>Niveau</th><th>Spécialité</th><th>Section / Groupe</th><th>Actions</th></tr>
+                                </thead>
+                                <tbody id="adminStudentsTable"></tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- VUE ADMIN : Gestion & Consultation des Groupes -->
+<div class="tab-pane fade" id="view-admin-groupes">
+    <h4 class="fw-bold"><i class="fas fa-id-card me-2"></i>Suivi des Groupes d'Étudiants Formés</h4>
+    <hr>
+    <div class="card card-custom p-3 mb-3">
+        <div class="row">
+            <div class="col-md-4">
+                <select id="filterGrpNiveau" class="form-select" onchange="loadAdminGroupes()">
+                    <option value="">Tous les niveaux</option>
+                    <option value="L3">L3</option>
+                    <option value="4ING">4ING</option>
+                    <option value="Master 2">Master 2</option>
+                    <option value="5ING">5ING</option>
+                    <option value="M2 + 5ING">M2 + 5ING</option>
+                </select>
+            </div>
+        </div>
+    </div>
+    <div class="card card-custom p-3">
+        <table class="table table-bordered table-striped bg-white align-middle">
+            <thead>
+                <tr>
+                    <th>Niveau / Spécialité</th>
+                    <th>Membres du Groupe</th>
+                    <th>Encadrant</th>
+                    <th>Sujet / Statut</th>
+                    <th class="text-end">Actions</th>
+                </tr>
+            </thead>
+            <tbody id="adminGroupsTable"></tbody>
+        </table>
+    </div>
+</div>
+
+                    <!-- VUE ADMIN : PHASES, AFFECTATIONS, EXPORTS ET MAINTENANCE -->
+                    <div class="tab-pane fade" id="view-admin-workflow">
+                        <h4 class="fw-bold">Pilotage des phases et affectations</h4><hr>
+                        <div class="card card-custom p-3 mb-3">
+                            <h5>Calendrier des trois phases</h5>
+                            <div id="phaseForms" class="row g-3"></div>
+                        </div>
+                        <div class="card card-custom p-3 mb-3">
+                            <h5>Statistiques par catégorie</h5><div id="groupStats"></div>
+                        </div>
+                        <div class="card card-custom p-3 mb-3">
+                            <h5>Lancement des affectations (brouillon avant validation)</h5>
+                            <div class="row g-2 align-items-end">
+                                <div class="col-md-4"><label>Année universitaire</label><input id="assignYear" class="form-control" value="2026-2027"></div>
+                                <div class="col-md-4"><label>Catégorie</label><select id="assignLevel" class="form-select"><option>L3</option><option>4ING</option><option>Master 2</option><option>5ING</option><option>M2 + 5ING</option></select></div>
+                                <div class="col-md-4"><button class="btn btn-primary w-100" onclick="launchAssignments()">Générer le brouillon</button></div>
+                            </div>
+                            <div id="assignmentPreview" class="mt-3"></div>
+                        </div>
+                        <div class="card card-custom p-3 mb-3">
+                            <h5>Capacités d'encadrement par enseignant</h5><p class="small text-muted">L'administrateur peut ajuster les capacités avant de lancer les affectations.</p><div id="teacherCapacityEditor"></div>
+                        </div>
+                        <div class="card card-custom p-3 mb-3">
+                            <h5>Exports</h5>
+                            <div class="row g-2">
+                                <div class="col-md-4"><label>Catégorie des groupes</label><select id="exportLevel" class="form-select"><option value="">Toutes</option><option>L3</option><option>4ING</option><option>Master 2</option><option>5ING</option><option>M2 + 5ING</option></select></div>
+                                <div class="col-md-8 d-flex flex-wrap gap-2 align-items-end"><button class="btn btn-outline-primary" onclick="downloadExport('groupes')">Groupes</button><button class="btn btn-outline-primary" onclick="downloadExport('enseignants')">Enseignants</button><button class="btn btn-outline-primary" onclick="downloadExport('affectations')">Affectations</button></div>
+                            </div>
+                        </div>
+                        <div class="card card-custom p-3 border border-danger">
+                            <h5 class="text-danger">Maintenance de la base de données</h5>
+                            <p class="small">Action irréversible. Sélectionnez précisément les tables à vider.</p>
+                            <div class="row g-2" id="maintenanceTables"></div>
+                            <div class="mt-2"><label>Saisissez exactement : VIDER LES DONNEES</label><input id="maintenanceConfirm" class="form-control" autocomplete="off"></div>
+                            <button class="btn btn-danger mt-2" onclick="clearSelectedTables()">Vider les tables sélectionnées</button>
+                        </div>
+                    </div>
+
+                    <!-- VUE ADMIN 3 : Imports Excel & Ajouts Manuels -->
+                    <div class="tab-pane fade" id="view-admin-import">
+                        <h4 class="fw-bold text-dark"><i class="fas fa-file-excel me-2"></i>Importation & Ajout Manuel</h4>
+                        <hr>
+                        <ul class="nav nav-tabs mb-3" id="adminImportTab" role="tablist">
+                            <li class="nav-item"><button class="nav-link active" data-bs-toggle="tab" data-bs-target="#tab-excel">Importation Excel</button></li>
+                            <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-manual">Ajout Manuel</button></li>
+                        </ul>
+
+                        <div class="tab-content">
+                            <div class="tab-pane fade show active" id="tab-excel">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="card card-custom p-3">
+                                            <h5>Importer les Étudiants</h5>
+                                            <form id="importStudentsForm">
+                                                <div class="mb-2"><label>Année Universitaire</label><input type="text" id="impStYear" class="form-control" value="2025-2026" required></div>
+                                                <div class="mb-2">
+                                                    <label>Niveau</label>
+                                                    <select id="impStNiveau" class="form-select">
+                                                        <option value="L3">L3</option><option value="4ING">4ING</option><option value="Master 2">Master 2</option><option value="5ING">5ING</option>
+                                                    </select>
+                                                </div>
+                                                <div class="mb-2"><label>Spécialité</label><select id="impStSpec" class="form-select" required><option value="">Choisir une spécialité</option></select></div>
+                                                <div class="mb-2"><label>Fichier Excel (.xlsx)</label><input type="file" id="impStFile" class="form-control" accept=".xlsx,.xls" required></div>
+                                                <button type="submit" class="btn btn-primary btn-sm w-100 mt-2">Lancer l'importation</button>
+                                            </form>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="card card-custom p-3">
+                                            <h5>Importer les Enseignants</h5>
+                                            <form id="importTeachersForm">
+                                                <div class="mb-2"><label>Année Universitaire</label><input type="text" id="impTcYear" class="form-control" value="2025-2026" required></div>
+                                                <div class="mb-2"><label>Fichier Excel (.xlsx)</label><input type="file" id="impTcFile" class="form-control" accept=".xlsx,.xls" required></div>
+                                                <button type="submit" class="btn btn-primary btn-sm w-100 mt-2">Lancer l'importation</button>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="tab-pane fade" id="tab-manual">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="card card-custom p-3">
+                                            <h5>Ajouter un Étudiant Manuellement</h5>
+                                            <form id="addStudentManualForm">
+                                                <div class="mb-2"><label>Année Universitaire</label><input type="text" id="manStYear" class="form-control" value="2025-2026" required></div>
+                                                <div class="row">
+                                                    <div class="col-md-6 mb-2">
+                                                        <label>Niveau</label>
+                                                        <select id="manStNiveau" class="form-select">
+                                                            <option value="L3">L3</option><option value="4ING">4ING</option><option value="Master 2">Master 2</option><option value="5ING">5ING</option>
+                                                        </select>
+                                                    </div>
+                                                    <div class="col-md-6 mb-2"><label>Spécialité</label><select id="manStSpec" class="form-select" required><option value="">Choisir une spécialité</option></select></div>
+                                                </div>
+                                                <div class="mb-2"><label>Matricule</label><input type="text" id="manStMatricule" class="form-control" required></div>
+                                                <div class="row">
+                                                    <div class="col-md-6 mb-2"><label>Nom</label><input type="text" id="manStNom" class="form-control" required></div>
+                                                    <div class="col-md-6 mb-2"><label>Prénom</label><input type="text" id="manStPrenom" class="form-control" required></div>
+                                                </div>
+                                                <div class="row">
+                                                    <div class="col-md-6 mb-2"><label>Section</label><input type="text" id="manStSection" class="form-control"></div>
+                                                    <div class="col-md-6 mb-2"><label>Groupe</label><input type="text" id="manStGroupe" class="form-control"></div>
+                                                </div>
+                                                <button type="submit" id="btnSubmitStudent" class="btn btn-success btn-sm w-100 mt-2">Enregistrer l'étudiant</button>
+                                                </form>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="card card-custom p-3">
+                                            <h5>Ajouter un Enseignant Manuellement</h5>
+                                            <form id="addTeacherManualForm">
+                                                <div class="mb-2"><label>Année Universitaire</label><input type="text" id="manTcYear" class="form-control" value="2025-2026" required></div>
+                                                <div class="row">
+                                                    <div class="col-md-6 mb-2"><label>Nom</label><input type="text" id="manTcNom" class="form-control" required></div>
+                                                    <div class="col-md-6 mb-2"><label>Prénom</label><input type="text" id="manTcPrenom" class="form-control" required></div>
+                                                </div>
+                                                <div class="mb-2"><label>Email Professionnel</label><input type="email" id="manTcEmail" class="form-control" required></div>
+                                                <button type="submit" class="btn btn-success btn-sm w-100 mt-2">Enregistrer l'enseignant</button>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- VUE ADMIN 4 : Validation des Comptes -->
+                    <div class="tab-pane fade" id="view-admin-users">
+                        <h4 class="fw-bold"><i class="fas fa-user-check me-2"></i>Comptes en Attente de Validation</h4>
+                        <hr>
+                        <table class="table table-bordered table-striped bg-white align-middle">
+                            <thead>
+                                <tr><th>Nom & Prénom</th><th>Rôle</th><th>Email / Matricule</th><th>Actions</th></tr>
+                            </thead>
+                            <tbody id="pendingUsersTable"></tbody>
+                        </table>
+                    </div>
+
+                    <!-- VUE ADMIN 5 : Enseignants, Validateurs et Groupes Encadrés -->
+                    <div class="tab-pane fade" id="view-admin-teachers">
+                        <h4 class="fw-bold"><i class="fas fa-chalkboard-teacher me-2"></i>Gestion des Enseignants & Groupes Encadrés</h4>
+                        <hr>
+                        <div class="card card-custom p-3">
+                            <table class="table table-bordered table-striped bg-white align-middle">
+                                <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Nom & Prénom</th>
+                                        <th>Email</th>
+                                        <th>Membre Validateur</th>
+                                        <th>Groupes Encadrés</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="adminTeachersTable"></tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- VUE ÉTUDIANT -->
+                    <div class="tab-pane fade" id="view-student-group">
+                        <h4 class="fw-bold"><i class="fas fa-users me-2"></i>Création de Groupe & Dépôt de Sujet Externe</h4>
+                        <hr>
+                        <div class="card card-custom p-4">
+                            <form id="createGroupForm">
+                                <div class="row">
+                                    <div class="col-md-4 mb-3"><label>Année Universitaire</label><input type="text" id="grpYear" class="form-control" value="2025-2026" required></div>
+                                    <div class="col-md-4 mb-3">
+                                        <label>Niveau</label>
+                                        <select id="grpNiveau" class="form-select" onchange="updateGroupRulesHint()">
+                                            <option value="L3">L3 (Trinôme exact : 3)</option>
+                                            <option value="4ING">4ING (Groupe : 4 à 6)</option>
+                                            <option value="Master 2">Master 2 (Binôme exact : 2)</option>
+                                            <option value="5ING">5ING (Binôme exact : 2)</option>
+                                            <option value="M2 + 5ING">M2 + 5ING (binôme mixte : 1 M2 + 1 5ING)</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-4 mb-3"><label>Spécialité (si applicable)</label><select id="grpSpec" class="form-select"><option value="">Choisir une spécialité</option></select></div>
+                                </div>
+                                <div class="alert alert-info fw-bold" id="groupRulesHint">Règle L3 : Le groupe doit contenir exactement 3 étudiants.</div>
+                                <div class="mb-3">
+                                    <label>Votre matricule (ajouté automatiquement)</label>
+                                    <input type="text" id="grpCreatorMatricule" class="form-control mb-2" readonly placeholder="Matricule du compte connecté">
+                                    <label>Matricules des autres membres (séparés par des virgules)</label>
+                                    <input type="text" id="grpMembers" class="form-control" placeholder="Saisissez uniquement les autres membres" required>
+                                </div>
+                                <hr>
+                                <h5>Proposer un Sujet Externe (Optionnel)</h5>
+                                <div class="mb-3"><label>Titre du Sujet</label><input type="text" id="grpSubjectTitle" class="form-control"></div>
+                                <div class="mb-3"><label>Fichier (PDF/DOC)</label><input type="file" id="grpSubjectFile" class="form-control" accept=".pdf,.doc,.docx"></div>
+                                <button type="submit" class="btn btn-success"><i class="fas fa-paper-plane me-2"></i>Valider et Créer le Groupe</button>
+                            </form>
+                        </div>
+                        <div class="card card-custom p-3 mt-3"><div class="d-flex justify-content-between align-items-center"><h5>Mon groupe et mon sujet externe</h5><button class="btn btn-outline-primary btn-sm" onclick="loadStudentGroups()">Actualiser</button></div><div id="studentGroupsList" class="mt-2"></div></div>
+                    </div>
+
+                    <!-- VUE ENSEIGNANT -->
+                    <div class="tab-pane fade" id="view-teacher-dashboard">
+                        <h4 class="fw-bold"><i class="fas fa-chalkboard-teacher me-2"></i>Espace Enseignant</h4>
+                        <hr>
+                        <div class="card card-custom p-3 mb-3">
+                            <h5>Préférences d'encadrement</h5>
+                            <div class="row g-2 align-items-end"><div class="col-md-4"><label>Filtrer les groupes par catégorie</label><select id="teacherGroupLevel" class="form-select"><option value="">Toutes</option><option>L3</option><option>4ING</option><option>Master 2</option><option>5ING</option><option>M2 + 5ING</option></select></div><div class="col-md-3"><button class="btn btn-outline-primary" onclick="loadTeacherGroups()">Afficher les groupes</button></div></div>
+                            <div id="teacherGroupsChoices" class="mt-3"></div><button class="btn btn-success btn-sm mt-2" onclick="saveTeacherPreferences()">Enregistrer mes préférences</button>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-5">
+                                <div class="card card-custom p-3 mb-3">
+                                    <h5>Mes Quotas d'Encadrement</h5>
+                                    <form id="teacherQuotasForm">
+                                        <div class="mb-2"><label>Max Groupes L3</label><input type="number" id="qL3" class="form-control" min="0" value="0"></div>
+                                        <div class="mb-2"><label>Max Groupes 4ING</label><input type="number" id="q4ING" class="form-control" min="0" value="0"></div>
+                                        <div class="mb-2">
+                                            <label>Quota global historique M2 / 5ING (minimum : 2)</label>
+                                            <input type="number" id="qM2" class="form-control" min="2" value="2" required>
+                                        </div>
+                                        <div class="row g-2">
+                                            <div class="col-md-4"><label>Master 2</label><input type="number" id="qM2Only" class="form-control" min="0" value="0"></div>
+                                            <div class="col-md-4"><label>5ING</label><input type="number" id="q5ING" class="form-control" min="0" value="0"></div>
+                                            <div class="col-md-4"><label>M2 + 5ING</label><input type="number" id="qMixed" class="form-control" min="0" value="0"></div>
+                                        </div>
+                                        <button type="submit" class="btn btn-primary btn-sm mt-2">Mettre à jour les quotas</button>
+                                    </form>
+                                </div>
+                            </div>
+                            <div class="col-md-7">
+                                <div class="card card-custom p-3">
+                                    <h5>Proposer un Sujet Interne</h5>
+                                    <form id="teacherSubjectForm">
+                                        <div class="mb-2"><label>Année Universitaire</label><input type="text" id="subYear" class="form-control" value="2025-2026" required></div>
+                                        <div class="row">
+                                            <div class="col-md-6 mb-2">
+                                                <label>Niveau Cible</label>
+                                                <select id="subNiveau" class="form-select">
+                                                    <option value="L3">L3</option><option value="4ING">4ING</option><option value="Master 2">Master 2</option><option value="5ING">5ING</option><option value="M2 + 5ING">M2 + 5ING</option>
+                                                </select>
+                                            </div>
+                                            <div class="col-md-6 mb-2"><label>Spécialité</label><select id="subSpec" class="form-select"><option value="Toutes">Toutes</option></select></div>
+                                        </div>
+                                        <div class="mb-2"><label>Titre du Sujet</label><input type="text" id="subTitle" class="form-control" required></div>
+                                        <div class="mb-2"><label>Description</label><textarea id="subDesc" class="form-control" rows="3"></textarea></div>
+                                        <div class="mb-2"><label>Capacité maximale (nombre de groupes)</label><input type="number" id="subCapacity" class="form-control" min="1" value="1" required></div>
+                                        <button type="submit" class="btn btn-success btn-sm">Publier le sujet</button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- VUE VALIDATEUR -->
+                    <div class="tab-pane fade" id="view-validator-arbitrage">
+                        <h4 class="fw-bold"><i class="fas fa-gavel me-2"></i>Arbitrage des Sujets Externes</h4>
+                        <hr>
+                        <div class="card card-custom p-3">
+                            <table class="table table-bordered table-striped bg-white align-middle">
+                                <thead>
+                                    <tr><th>Niveau / Spécialité</th><th>Chef de Groupe</th><th>Titre</th><th>Document</th><th>Actions</th></tr>
+                                </thead>
+                                <tbody id="validatorTable"></tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Modal pour afficher les groupes d'un enseignant -->
+    <div class="modal fade" id="teacherGroupsModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="teacherGroupsModalTitle">Groupes Encadrés</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body" id="teacherGroupsModalBody"></div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Modal Modification Spécialité -->
+    <div class="modal fade" id="editSpecialiteModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Modifier la Spécialité</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="editSpecialiteForm">
+                        <input type="hidden" id="editSpecId">
+                        <div class="mb-3">
+                            <label class="form-label">Niveau d'étude</label>
+                            <select id="editSpecNiveau" class="form-select" required>
+                                <option value="L3">L3</option>
+                                <option value="4ING">4ING</option>
+                                <option value="Master 2">Master 2</option>
+                                <option value="5ING">5ING</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Nom de la Spécialité</label>
+                            <input type="text" id="editSpecNom" class="form-control" required>
+                        </div>
+                        <button type="submit" class="btn btn-success w-100">Enregistrer les modifications</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Modification Étudiant -->
+<div class="modal fade" id="editStudentModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Modifier l'Étudiant</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="editStudentForm">
+                    <input type="hidden" id="editStId">
+                    <div class="mb-2">
+                        <label>Niveau</label>
+                        <select id="editStNiveau" class="form-select" required>
+                            <option value="L3">L3</option><option value="4ING">4ING</option><option value="Master 2">Master 2</option><option value="5ING">5ING</option>
+                        </select>
+                    </div>
+                    <div class="mb-2"><label>Spécialité</label><select id="editStSpec" class="form-select" required><option value="">Choisir une spécialité</option></select></div>
+                    <div class="mb-2"><label>Matricule</label><input type="text" id="editStMatricule" class="form-control" required></div>
+                    <div class="row">
+                        <div class="col-md-6 mb-2"><label>Nom</label><input type="text" id="editStNom" class="form-control" required></div>
+                        <div class="col-md-6 mb-2"><label>Prénom</label><input type="text" id="editStPrenom" class="form-control" required></div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-2"><label>Section</label><input type="text" id="editStSection" class="form-control"></div>
+                        <div class="col-md-6 mb-2"><label>Groupe</label><input type="text" id="editStGroupe" class="form-control"></div>
+                    </div>
+                    <button type="submit" class="btn btn-success w-100 mt-2">Enregistrer</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Modification Enseignant -->
+<div class="modal fade" id="editTeacherModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Modifier l'Enseignant</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="editTeacherForm">
+                    <input type="hidden" id="editTcId">
+                    <div class="row">
+                        <div class="col-md-6 mb-2"><label>Nom</label><input type="text" id="editTcNom" class="form-control" required></div>
+                        <div class="col-md-6 mb-2"><label>Prénom</label><input type="text" id="editTcPrenom" class="form-control" required></div>
+                    </div>
+                    <div class="mb-2"><label>Email</label><input type="email" id="editTcEmail" class="form-control" required></div>
+                    <button type="submit" class="btn btn-success w-100 mt-2">Enregistrer</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+<script>
+        const API_URL = `${window.location.origin}/api`;
+        let currentUser = null;
+        let authToken = sessionStorage.getItem('pfe_auth_token');
+
+        async function apiFetch(url, options = {}) {
+            const headers = new Headers(options.headers || {});
+            if (authToken) headers.set('Authorization', `Bearer ${authToken}`);
+            return fetch(url, { ...options, headers });
+        }
+
+        function toggleRegisterFields() {
+            const role = document.getElementById('regRole').value;
+            document.getElementById('studentFields').style.display = (role === 'student') ? 'block' : 'none';
+        }
+
+        function fillGroupCreatorMatricule() {
+            const el = document.getElementById('grpCreatorMatricule');
+            if (el && currentUser) el.value = currentUser.matricule || '';
+        }
+
+        function updateGroupRulesHint() {
+            const niv = document.getElementById('grpNiveau').value;
+            const hint = document.getElementById('groupRulesHint');
+            if (niv === 'L3') hint.innerText = "Règle L3 : trinôme exact (3 étudiants), spécialités différentes autorisées.";
+            else if (niv === '4ING') hint.innerText = "Règle 4ING : groupe de 4 à 6 étudiants (règle conservée).";
+            else if (niv === 'M2 + 5ING') hint.innerText = "Règle M2 + 5ING : binôme mixte composé d’un étudiant de Master 2 et d’un étudiant de 5ING.";
+            else hint.innerText = `Règle ${niv} : binôme exact (2 étudiants).`;
+        }
+
+        async function loadDynamicSpecialties() {
+            try {
+                const res = await fetch(`${API_URL}/specialites`); const data = await res.json();
+                const mappings = [['regNiveau','regSpecialite'],['grpNiveau','grpSpec'],['impStNiveau','impStSpec'],['manStNiveau','manStSpec'],['editStNiveau','editStSpec'],['subNiveau','subSpec']];
+                mappings.forEach(([levelId,specId]) => {
+                    const level=document.getElementById(levelId), spec=document.getElementById(specId); if(!level||!spec)return;
+                    const refresh=()=>{const current=spec.value; spec.innerHTML=(specId==='subSpec'?'<option value="Toutes">Toutes</option>':'<option value="">Choisir une spécialité</option>'); (data.specialites||[]).filter(x=>x.niveau===level.value).forEach(x=>{const o=document.createElement('option');o.value=x.nom_specialite;o.textContent=x.nom_specialite;spec.appendChild(o);}); if([...spec.options].some(o=>o.value===current))spec.value=current;};
+                    if(!level.dataset.specialtyBound){level.addEventListener('change',refresh);level.dataset.specialtyBound='1';} refresh();
+                });
+            } catch(e) { console.warn('Chargement des spécialités :',e); }
+        }
+        async function verifyRegistrationEmail(){
+            try{const r=await apiFetch(`${API_URL}/auth/verify-email`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email:document.getElementById('verifyEmailAddress').value.trim(),code:document.getElementById('verifyEmailCode').value.trim()})});const d=await r.json();if(!r.ok)throw new Error(d.error);showAlert(d.message,'success','authAlert');}catch(e){showAlert(e.message,'danger','authAlert');}
+        }
+        async function changeTemporaryPassword(){
+            try{const r=await apiFetch(`${API_URL}/auth/change-temporary-password`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({username:document.getElementById('tempUsername').value.trim(),temporary_password:document.getElementById('tempPassword').value,new_password:document.getElementById('newPassword').value})});const d=await r.json();if(!r.ok)throw new Error(d.error);showAlert(d.message,'success','authAlert');}catch(e){showAlert(e.message,'danger','authAlert');}
+        }
+
+        loadDynamicSpecialties();
+
+        // Connexion
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            try {
+                const res = await apiFetch(`${API_URL}/auth/login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        username: document.getElementById('loginUsername').value,
+                        password: document.getElementById('loginPassword').value
+                    })
+                });
+                const data = await res.json();
+                if (!res.ok) throw new Error(data.error);
+                authToken = data.token;
+                sessionStorage.setItem('pfe_auth_token', authToken);
+                currentUser = data.user;
+                setupDashboard();
+            } catch (err) {
+                showAlert(err.message, 'danger', 'authAlert');
+            }
+        });
+
+        function setupDashboard() {
+            document.getElementById('authSection').style.display = 'none';
+            document.getElementById('dashboardSection').style.display = 'flex';
+            document.getElementById('userInfo').style.display = 'flex';
+            document.getElementById('userDisplayName').innerText = `${currentUser.prenom} ${currentUser.nom} (${currentUser.role.toUpperCase()})`;
+            fillGroupCreatorMatricule();
+            loadDynamicSpecialties();
+
+            const nav = document.getElementById('v-pills-tab');
+            nav.innerHTML = '';
+
+            if (currentUser.role === 'admin') {
+                nav.innerHTML += `<button class="nav-link active mb-2" data-bs-toggle="pill" data-bs-target="#view-admin-specialites" onclick="loadSpecialites()">Niveaux & Spécialités</button>`;
+                nav.innerHTML += `<button class="nav-link mb-2" data-bs-toggle="pill" data-bs-target="#view-admin-students" onclick="filterStudents()">Liste des Étudiants</button>`;
+                nav.innerHTML += `<button class="nav-link mb-2" data-bs-toggle="pill" data-bs-target="#view-admin-import">Imports & Ajouts</button>`;
+                nav.innerHTML += `<button class="nav-link mb-2" data-bs-toggle="pill" data-bs-target="#view-admin-users" onclick="loadPendingUsers()">Validation Comptes</button>`;
+                nav.innerHTML += `<button class="nav-link mb-2" data-bs-toggle="pill" data-bs-target="#view-admin-teachers" onclick="loadAdminTeachers()">Enseignants & Groupes</button>`;
+                // Dans setupDashboard(), sous les autres boutons de l'admin, ajoute :
+                nav.innerHTML += `<button class="nav-link mb-2" data-bs-toggle="pill" data-bs-target="#view-admin-groupes" onclick="loadAdminGroupes()">Gestion des Groupes</button>`;
+                nav.innerHTML += `<button class="nav-link mb-2" data-bs-toggle="pill" data-bs-target="#view-admin-workflow" onclick="loadAdminWorkflow()">Phases, Affectations & Exports</button>`;
+                showTab('view-admin-specialites');
+                loadSpecialites();
+            } else if (currentUser.role === 'student') {
+                nav.innerHTML += `<button class="nav-link active mb-2" data-bs-toggle="pill" data-bs-target="#view-student-group">Mon Groupe & Sujet</button>`;
+                showTab('view-student-group');
+                loadStudentGroups();
+            } else if (currentUser.role === 'teacher') {
+                nav.innerHTML += `<button class="nav-link active mb-2" data-bs-toggle="pill" data-bs-target="#view-teacher-dashboard">Quotas & Sujets</button>`;
+                if (Number(currentUser.is_validator) === 1) {
+                    nav.innerHTML += `<button class="nav-link mb-2" data-bs-toggle="pill" data-bs-target="#view-validator-arbitrage" onclick="loadValidatorSubjects()">Arbitrage Sujets</button>`;
+                }
+                showTab('view-teacher-dashboard');
+                fillTeacherQuotas();
+            } else if (currentUser.role === 'validator') {
+                nav.innerHTML += `<button class="nav-link active mb-2" data-bs-toggle="pill" data-bs-target="#view-validator-arbitrage" onclick="loadValidatorSubjects()">Arbitrage Sujets</button>`;
+                showTab('view-validator-arbitrage');
+                loadValidatorSubjects();
+            }
+        }
+
+        async function loadStudentGroups(){
+            try{
+                const r=await apiFetch(`${API_URL}/groupes/mes-groupes`);const d=await r.json();if(!r.ok)throw new Error(d.error);
+                const root=document.getElementById('studentGroupsList');
+                root.innerHTML=(d.groupes||[]).map(g=>{const title=encodeURIComponent(g.sujet_titre||'');return `<div class="border rounded p-3 mb-2"><strong>Groupe ${g.id} — ${escapeHtml(g.niveau)} / ${escapeHtml(g.specialite)}</strong><div>${escapeHtml(g.membres||'')}</div><div>Sujet : ${escapeHtml(g.sujet_titre||'Aucun')} — statut : ${escapeHtml(g.statut_sujet)}</div><div class="mt-2"><button class="btn btn-outline-primary btn-sm me-2" onclick="editExternalTopic(${g.id},decodeURIComponent('${title}'))">Modifier le sujet</button><button class="btn btn-outline-secondary btn-sm me-2" onclick="replaceExternalTopicFile(${g.id},decodeURIComponent('${title}'))">Remplacer le document</button><button class="btn btn-outline-danger btn-sm" onclick="deleteExternalTopic(${g.id})">Supprimer le sujet</button></div></div>`;}).join('')||'<p class="text-muted">Aucun groupe créé.</p>';
+            }catch(e){showAlert(e.message,'danger');}
+        }
+        async function editExternalTopic(id,currentTitle){const title=prompt('Nouveau titre du sujet externe :',currentTitle);if(title===null)return;const fd=new FormData();fd.append('sujet_titre',title);try{const r=await apiFetch(`${API_URL}/groupes/${id}/sujet-externe`,{method:'PUT',body:fd});const d=await r.json();if(!r.ok)throw new Error(d.error);showAlert(d.message,'success');loadStudentGroups();}catch(e){showAlert(e.message,'danger');}}
+        function replaceExternalTopicFile(id,currentTitle){const input=document.createElement('input');input.type='file';input.accept='.pdf,.doc,.docx';input.onchange=async()=>{if(!input.files[0])return;const fd=new FormData();fd.append('sujet_titre',currentTitle);fd.append('file',input.files[0]);try{const r=await apiFetch(`${API_URL}/groupes/${id}/sujet-externe`,{method:'PUT',body:fd});const d=await r.json();if(!r.ok)throw new Error(d.error);showAlert(d.message,'success');loadStudentGroups();}catch(e){showAlert(e.message,'danger');}};input.click();}
+        async function deleteExternalTopic(id){if(!confirm('Supprimer le sujet externe de ce groupe ?'))return;try{const r=await apiFetch(`${API_URL}/groupes/${id}/sujet-externe`,{method:'DELETE'});const d=await r.json();if(!r.ok)throw new Error(d.error);showAlert(d.message,'success');loadStudentGroups();}catch(e){showAlert(e.message,'danger');}}
+        async function loadTeacherCapacityEditor(){
+            try{const r=await apiFetch(`${API_URL}/admin/enseignants`);const d=await r.json();if(!r.ok)throw new Error(d.error);const rows=d.enseignants||[];document.getElementById('teacherCapacityEditor').innerHTML=rows.map(t=>`<div class="border rounded p-2 mb-2"><strong>${escapeHtml(t.prenom||'')} ${escapeHtml(t.nom||'')}</strong> <span class="small text-muted">${escapeHtml(t.email||'')}</span><div class="row g-2 mt-1">${[['L3','max_groupes_l3'],['4ING','max_groupes_4ing'],['M2','max_groupes_m2'],['5ING','max_groupes_5ing'],['M2+5ING','max_groupes_m2_5ing_mixte']].map(([label,key])=>`<div class="col"><label class="small">${label}</label><input type="number" min="0" class="form-control form-control-sm" id="cap_${t.id}_${key}" value="${t[key]||0}"></div>`).join('')}</div><button class="btn btn-sm btn-outline-primary mt-2" onclick="saveTeacherCapacity(${t.id})">Enregistrer les capacités</button></div>`).join('')||'<p>Aucun enseignant importé.</p>';}catch(e){showAlert(e.message,'danger');}
+        }
+        async function saveTeacherCapacity(id){try{const keys=['max_groupes_l3','max_groupes_4ing','max_groupes_m2','max_groupes_5ing','max_groupes_m2_5ing_mixte'];const payload={};keys.forEach(k=>payload[k]=document.getElementById(`cap_${id}_${k}`).value);const r=await apiFetch(`${API_URL}/admin/enseignants/${id}/capacites`,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});const d=await r.json();if(!r.ok)throw new Error(d.error);showAlert(d.message,'success');}catch(e){showAlert(e.message,'danger');}}
+
+        async function loadGroupStats(){try{const r=await apiFetch(`${API_URL}/admin/statistiques/groupes`);const d=await r.json();if(!r.ok)throw new Error(d.error);document.getElementById('groupStats').innerHTML=`<div class="table-responsive"><table class="table table-sm"><thead><tr><th>Catégorie</th><th>Groupes</th><th>Étudiants</th><th>Affectés</th><th>Sujets externes validés</th></tr></thead><tbody>${(d.statistiques||[]).map(x=>`<tr><td>${x.categorie}</td><td>${x.nb_groupes}</td><td>${x.nb_etudiants}</td><td>${x.nb_groupes_affectes||0}</td><td>${x.nb_sujets_externes_valides||0}</td></tr>`).join('')}</tbody></table></div>`;}catch(e){showAlert(e.message,'danger');}}
+        async function loadAdminWorkflow(){
+            try{const r=await apiFetch(`${API_URL}/admin/phases`);const d=await r.json();if(!r.ok)throw new Error(d.error);await loadGroupStats();const root=document.getElementById('phaseForms');root.innerHTML='';(d.phases||[]).forEach(p=>{const col=document.createElement('div');col.className='col-md-4';const key=p.phase_key;col.innerHTML=`<div class="border rounded p-3 h-100"><h6>${p.libelle}</h6><label>Début</label><input type="datetime-local" class="form-control mb-2" id="phaseStart_${key}" value="${p.date_debut?toLocalDateTime(p.date_debut):''}"><label>Fin / Deadline</label><input type="datetime-local" class="form-control mb-2" id="phaseEnd_${key}" value="${p.date_fin?toLocalDateTime(p.date_fin):''}"><button class="btn btn-sm btn-primary" onclick="savePhase('${key}')">Enregistrer</button></div>`;root.appendChild(col);});
+            await loadTeacherCapacityEditor();
+            document.getElementById('maintenanceTables').innerHTML=['groupe_membres','groupes','validations_sujets','preferences_enseignants','sujets_internes','etudiants_import','enseignants_import','users','specialites','campagnes_affectation'].map(t=>`<div class="col-md-4"><label><input type="checkbox" class="form-check-input maintenance-table" value="${t}"> ${t}</label></div>`).join('');
+            }catch(e){showAlert(e.message,'danger');}
+        }
+        function toLocalDateTime(value){if(!value)return '';const d=new Date(value);const local=new Date(d.getTime()-d.getTimezoneOffset()*60000);return local.toISOString().slice(0,16);}
+        async function savePhase(key){try{const start=document.getElementById(`phaseStart_${key}`).value;const end=document.getElementById(`phaseEnd_${key}`).value;const date_debut=start?new Date(start).toISOString():'';const date_fin=end?new Date(end).toISOString():'';const r=await apiFetch(`${API_URL}/admin/phases/${key}`,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({date_debut,date_fin})});const d=await r.json();if(!r.ok)throw new Error(d.error);showAlert(d.message,'success');}catch(e){showAlert(e.message,'danger');}}
+        let lastAssignmentCampaign=null;
+        async function launchAssignments(){try{const r=await apiFetch(`${API_URL}/admin/affectations/lancer`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({annee_universitaire:document.getElementById('assignYear').value.trim(),niveau:document.getElementById('assignLevel').value})});const d=await r.json();if(!r.ok)throw new Error(d.error);lastAssignmentCampaign=d.campagne_id;const box=document.getElementById('assignmentPreview');box.innerHTML=`<p><strong>Brouillon #${d.campagne_id}</strong> — ${d.affectations.length} affectations proposées, ${d.non_affectes.length} groupes non affectés.</p><div class="table-responsive"><table class="table table-sm"><thead><tr><th>Groupe</th><th>Enseignant proposé</th></tr></thead><tbody>${[...d.affectations.map(a=>({groupe_id:a.groupe_id,enseignant_id:a.enseignant_id,enseignant:a.enseignant})),...d.non_affectes.map(a=>({groupe_id:a.groupe_id,enseignant_id:'',enseignant:'Non affecté'}))].map(a=>`<tr><td>${a.groupe_id}</td><td>${a.enseignant}</td><td><select class="form-select form-select-sm" id="draftTeacher_${a.groupe_id}"><option value="">Choisir…</option>${(d.enseignants||[]).map(t=>`<option value="${t.id}" ${Number(a.enseignant_id)===Number(t.id)?'selected':''}>${escapeHtml(t.prenom)} ${escapeHtml(t.nom)} (${t.capacite})</option>`).join('')}</select><button class="btn btn-sm btn-outline-secondary mt-1" onclick="adjustDraftAssignment(${d.campagne_id},${a.groupe_id})">Ajuster</button></td></tr>`).join('')}</tbody></table></div>${d.non_affectes.length?`<p class="text-danger">Groupes sans capacité : ${d.non_affectes.map(x=>x.groupe_id).join(', ')}</p>`:''}<button class="btn btn-success btn-sm" onclick="approveAssignments(${d.campagne_id})">Valider ce brouillon</button>`;}catch(e){showAlert(e.message,'danger');}}
+        async function adjustDraftAssignment(campaignId,groupId){try{const enseignant_id=document.getElementById(`draftTeacher_${groupId}`).value;if(!enseignant_id)throw new Error('Sélectionnez un enseignant.');const r=await apiFetch(`${API_URL}/admin/affectations/${campaignId}/ajuster`,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({groupe_id:groupId,enseignant_id:Number(enseignant_id)})});const d=await r.json();if(!r.ok)throw new Error(d.error);showAlert(d.message,'success');}catch(e){showAlert(e.message,'danger');}}
+        async function approveAssignments(id){if(!confirm('Confirmer définitivement les affectations proposées ?'))return;try{const r=await apiFetch(`${API_URL}/admin/affectations/${id}/valider`,{method:'POST'});const d=await r.json();if(!r.ok)throw new Error(d.error);showAlert(d.message,'success');}catch(e){showAlert(e.message,'danger');}}
+        function downloadExport(kind){const level=document.getElementById('exportLevel').value;const url=kind==='groupes'?`${API_URL}/admin/export/groupes${level?'?niveau='+encodeURIComponent(level):''}`:`${API_URL}/admin/export/${kind}`;fetch(url,{headers:{Authorization:`Bearer ${authToken}`}}).then(r=>{if(!r.ok)throw new Error('Export impossible');return r.blob();}).then(blob=>{const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=kind+'.csv';a.click();URL.revokeObjectURL(a.href);}).catch(e=>showAlert(e.message,'danger'));}
+        async function clearSelectedTables(){const tables=[...document.querySelectorAll('.maintenance-table:checked')].map(x=>x.value);if(!tables.length)return showAlert('Sélectionnez au moins une table.','warning');if(!confirm('Cette opération est irréversible. Continuer ?'))return;try{const r=await apiFetch(`${API_URL}/admin/maintenance/vider-tables`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({tables,confirmation:document.getElementById('maintenanceConfirm').value})});const d=await r.json();if(!r.ok)throw new Error(d.error);showAlert(d.message,'success');}catch(e){showAlert(e.message,'danger');}}
+        async function loadTeacherGroups(){try{const level=document.getElementById('teacherGroupLevel').value;const r=await apiFetch(`${API_URL}/enseignants/groupes-disponibles${level?'?niveau='+encodeURIComponent(level):''}`);const d=await r.json();if(!r.ok)throw new Error(d.error);document.getElementById('teacherGroupsChoices').innerHTML=(d.groupes||[]).map(g=>`<div class="form-check border-bottom py-2"><input class="form-check-input teacher-group-choice" type="checkbox" value="${g.id}" id="tg_${g.id}"><label class="form-check-label" for="tg_${g.id}"><strong>${escapeHtml(g.niveau)} / ${escapeHtml(g.specialite)}</strong> — Groupe ${g.id} — ${escapeHtml(g.membres||'')} ${g.sujet_titre?' | Sujet : '+escapeHtml(g.sujet_titre):''}</label></div>`).join('')||'<p class="text-muted">Aucun groupe disponible dans cette catégorie.</p>';}catch(e){showAlert(e.message,'danger');}}
+        async function saveTeacherPreferences(){try{const groupe_ids=[...document.querySelectorAll('.teacher-group-choice:checked')].map(x=>Number(x.value));const r=await apiFetch(`${API_URL}/enseignants/preferences`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({groupe_ids})});const d=await r.json();if(!r.ok)throw new Error(d.error);showAlert(d.message,'success');}catch(e){showAlert(e.message,'danger');}}
+
+        function showTab(id) {
+            document.querySelectorAll('.tab-pane').forEach(el => el.classList.remove('show', 'active'));
+            document.getElementById(id).classList.add('show', 'active');
+        }
+
+        async function logout() {
+            try { if (authToken) await apiFetch(`${API_URL}/auth/logout`, { method: 'POST' }); } catch (_) {}
+            currentUser = null;
+            authToken = null;
+            sessionStorage.removeItem('pfe_auth_token');
+            document.getElementById('dashboardSection').style.display = 'none';
+            document.getElementById('userInfo').style.display = 'none';
+            document.getElementById('authSection').style.display = 'flex';
+        }
+
+        function escapeHtml(value) { return String(value ?? '').replace(/[&<>\"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;',"'":'&#39;'}[ch])); }
+
+        function showAlert(msg, type = 'info', containerId = 'alertContainer') {
+            const container = document.getElementById(containerId);
+            if (!container) return;
+            container.replaceChildren();
+            const alert = document.createElement('div');
+            alert.className = `alert alert-${type} alert-dismissible fade show`;
+            alert.append(document.createTextNode(String(msg || '')));
+            const close = document.createElement('button');
+            close.type = 'button';
+            close.className = 'btn-close';
+            close.setAttribute('data-bs-dismiss', 'alert');
+            close.setAttribute('aria-label', 'Fermer');
+            alert.appendChild(close);
+            container.appendChild(alert);
+        }
+
+        // --- ADMIN : Niveaux & Spécialités ---
+        document.getElementById('addSpecialiteForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const res = await apiFetch(`${API_URL}/admin/specialites/ajouter`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    niveau: document.getElementById('specNiveau').value,
+                    nom_specialite: document.getElementById('specNom').value
+                })
+            });
+            const data = await res.json();
+            showAlert(data.message, res.ok ? 'success' : 'danger');
+            if (res.ok) {
+                document.getElementById('specNom').value = '';
+                loadSpecialites();
+            }
+        });
+
+        async function loadSpecialites() {
+            const res = await apiFetch(`${API_URL}/admin/specialites`);
+            const data = await res.json();
+            const tbody = document.getElementById('specialitesTable');
+            tbody.innerHTML = '';
+            if (data.specialites.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="3" class="text-center text-muted">Aucune spécialité définie.</td></tr>`;
+                return;
+            }
+            data.specialites.forEach(s => {
+                tbody.innerHTML += `
+                    <tr>
+                        <td><span class="badge bg-primary">${s.niveau}</span></td>
+                        <td>${s.nom_specialite}</td>
+                        <td class="text-end">
+                            <button class="btn btn-warning btn-sm me-1" onclick="openEditSpecialiteModal(${s.id}, '${s.niveau}', '${s.nom_specialite}')"><i class="fas fa-edit"></i></button>
+                            <button class="btn btn-danger btn-sm" onclick="deleteSpecialite(${s.id})"><i class="fas fa-trash"></i></button>
+                        </td>
+                    </tr>`;
+            });
+        }
+
+        // --- ADMIN : Filtrage & Recherche des Étudiants ---
+        async function filterStudents() {
+            const niveau = document.getElementById('filterStNiveau').value;
+            const specialite = document.getElementById('filterStSpec').value;
+            const q = document.getElementById('filterStSearch').value;
+
+            const res = await apiFetch(`${API_URL}/admin/etudiants/recherche?niveau=${encodeURIComponent(niveau)}&specialite=${encodeURIComponent(specialite)}&q=${encodeURIComponent(q)}`);
+            const data = await res.json();
+            const tbody = document.getElementById('adminStudentsTable');
+            tbody.innerHTML = '';
+
+            if (data.etudiants.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="6" class="text-center text-muted">Aucun étudiant trouvé.</td></tr>`;
+                return;
+            }
+
+data.etudiants.forEach(s => {
+    tbody.innerHTML += `
+        <tr>
+            <td class="fw-bold">${s.matricule}</td>
+            <td>${s.nom} ${s.prenom}</td>
+            <td><span class="badge bg-info text-dark">${s.niveau}</span></td>
+            <td>${s.specialite}</td>
+            <td>Sec: ${s.section || '-'} / Grp: ${s.groupe || '-'}</td>
+            <td class="text-end">
+                <button class="btn btn-warning btn-sm me-1" onclick='openEditStudentModal(${JSON.stringify(s)})'><i class="fas fa-edit"></i></button>
+                <button class="btn btn-danger btn-sm" onclick="deleteStudent(${s.id})"><i class="fas fa-trash"></i></button>
+            </td>
+        </tr>
+    `;
+});
+        }
+
+        // --- ADMIN : Enseignants & Leurs Groupes ---
+        async function loadAdminTeachers() {
+            const res = await apiFetch(`${API_URL}/admin/enseignants`);
+            const data = await res.json();
+            const tbody = document.getElementById('adminTeachersTable');
+            tbody.innerHTML = '';
+
+data.enseignants.forEach(t => {
+    const checked = t.is_validator === 1 ? 'checked' : '';
+    tbody.innerHTML += `
+        <tr>
+            <td>${t.id}</td>
+            <td class="fw-bold">${t.nom} ${t.prenom}</td>
+            <td>${t.email}</td>
+            <td>
+                <div class="form-check form-switch">
+                    <input class="form-check-input" type="checkbox" role="switch" id="valSwitch_${t.id}" ${checked} onchange="toggleValidator(${t.id}, this.checked)">
+                    <label class="form-check-label fw-semibold" for="valSwitch_${t.id}">${t.is_validator === 1 ? 'Oui' : 'Non'}</label>
+                </div>
+            </td>
+            <td>
+                <button class="btn btn-outline-primary btn-sm me-1" onclick="viewTeacherGroups(${t.id}, '${t.nom} ${t.prenom}')">
+                    <i class="fas fa-users me-1"></i>Groupes
+                </button>
+                <button class="btn btn-warning btn-sm me-1" onclick='openEditTeacherModal(${JSON.stringify(t)})'><i class="fas fa-edit"></i></button>
+                <button class="btn btn-danger btn-sm" onclick="deleteTeacher(${t.id})"><i class="fas fa-trash"></i></button>
+            </td>
+        </tr>
+    `;
+});
+        }
+
+        async function viewTeacherGroups(id, teacherName) {
+            const res = await apiFetch(`${API_URL}/admin/enseignants/${id}/groupes`);
+            const data = await res.json();
+            
+            document.getElementById('teacherGroupsModalTitle').innerText = `Groupes encadrés par ${teacherName}`;
+            const body = document.getElementById('teacherGroupsModalBody');
+            body.innerHTML = '';
+
+            if (data.groupes.length === 0) {
+                body.innerHTML = `<p class="text-muted text-center">Cet enseignant n'encadre aucun groupe pour le moment.</p>`;
+            } else {
+                let html = `<ul class="list-group">`;
+                data.groupes.forEach(g => {
+                    html += `
+                        <li class="list-group-item">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h6 class="mb-1 fw-bold">${g.sujet_titre || 'Sujet non encore attribué'}</h6>
+                                    <small class="text-muted"><strong>Niveau :</strong> ${g.niveau} ${g.specialite} | <strong>Étudiants :</strong> ${g.membres}</small>
+                                </div>
+                                <span class="badge bg-success">${g.statut_sujet}</span>
+                            </div>
+                        </li>
+                    `;
+                });
+                html += `</ul>`;
+                body.innerHTML = html;
+            }
+
+            const modal = new bootstrap.Modal(document.getElementById('teacherGroupsModal'));
+            modal.show();
+        }
+
+        async function toggleValidator(id, isChecked) {
+            const res = await apiFetch(`${API_URL}/admin/enseignants/${id}/toggle-validator`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ is_validator: isChecked ? 1 : 0 })
+            });
+            const data = await res.json();
+            showAlert(data.message, 'success');
+        }
+        // --- ADMIN : Importation Excel des Étudiants ---
+        document.getElementById('importStudentsForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const formData = new FormData();
+            formData.append('annee_universitaire', document.getElementById('impStYear').value);
+            formData.append('niveau', document.getElementById('impStNiveau').value);
+            formData.append('specialite', document.getElementById('impStSpec').value);
+            formData.append('file', document.getElementById('impStFile').files[0]);
+
+            try {
+                const res = await apiFetch(`${API_URL}/admin/import-etudiants`, {
+                    method: 'POST',
+                    body: formData // Pas besoin de définir Content-Type avec FormData, fetch le fait tout seul
+                });
+                const data = await res.json();
+                if (!res.ok) throw new Error(data.error);
+                
+                showAlert(`${data.message} (Insérés : ${data.details.inseres}, Ignorés/Erreurs : ${data.details.ignores_ou_erreurs})`, 'success');
+            } catch (err) {
+                showAlert(err.message, 'danger');
+            }
+        });
+
+        // --- ADMIN : Importation Excel des Enseignants ---
+        document.getElementById('importTeachersForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const formData = new FormData();
+            formData.append('annee_universitaire', document.getElementById('impTcYear').value);
+            formData.append('file', document.getElementById('impTcFile').files[0]);
+
+            try {
+                const res = await apiFetch(`${API_URL}/admin/import-enseignants`, {
+                    method: 'POST',
+                    body: formData
+                });
+                const data = await res.json();
+                if (!res.ok) throw new Error(data.error);
+                
+                showAlert(`${data.message} (Insérés : ${data.details.inseres}, Ignorés/Erreurs : ${data.details.ignores_ou_erreurs})`, 'success');
+            } catch (err) {
+                showAlert(err.message, 'danger');
+            }
+        });
+
+        function openEditSpecialiteModal(id, niveau, nom) {
+            document.getElementById('editSpecId').value = id;
+            document.getElementById('editSpecNiveau').value = niveau;
+            document.getElementById('editSpecNom').value = nom;
+            const modal = new bootstrap.Modal(document.getElementById('editSpecialiteModal'));
+            modal.show();
+        }
+
+        document.getElementById('editSpecialiteForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const id = document.getElementById('editSpecId').value;
+            const payload = {
+                niveau: document.getElementById('editSpecNiveau').value,
+                nom_specialite: document.getElementById('editSpecNom').value
+            };
+
+            const res = await apiFetch(`${API_URL}/admin/specialites/${id}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+            const data = await res.json();
+            showAlert(data.message, res.ok ? 'success' : 'danger');
+            
+            if (res.ok) {
+                bootstrap.Modal.getInstance(document.getElementById('editSpecialiteModal')).hide();
+                loadSpecialites();
+            }
+        });
+
+        async function deleteSpecialite(id) {
+            if (!confirm("Voulez-vous vraiment supprimer cette spécialité ?")) return;
+
+            const res = await apiFetch(`${API_URL}/admin/specialites/${id}`, {
+                method: 'DELETE'
+            });
+            const data = await res.json();
+            showAlert(data.message, res.ok ? 'success' : 'danger');
+            if (res.ok) loadSpecialites();
+        }
+
+
+       // --- ÉTUDIANTS : Édition & Suppression ---
+function openEditStudentModal(s) {
+    document.getElementById('editStId').value = s.id;
+    document.getElementById('editStNiveau').value = s.niveau;
+    document.getElementById('editStSpec').value = s.specialite;
+    document.getElementById('editStMatricule').value = s.matricule;
+    document.getElementById('editStNom').value = s.nom;
+    document.getElementById('editStPrenom').value = s.prenom;
+    document.getElementById('editStSection').value = s.section || '';
+    document.getElementById('editStGroupe').value = s.groupe || '';
+    new bootstrap.Modal(document.getElementById('editStudentModal')).show();
+}
+
+document.getElementById('editStudentForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const id = document.getElementById('editStId').value;
+    const payload = {
+        niveau: document.getElementById('editStNiveau').value,
+        specialite: document.getElementById('editStSpec').value,
+        matricule: document.getElementById('editStMatricule').value,
+        nom: document.getElementById('editStNom').value,
+        prenom: document.getElementById('editStPrenom').value,
+        section: document.getElementById('editStSection').value,
+        groupe: document.getElementById('editStGroupe').value
+    };
+
+    const res = await apiFetch(`${API_URL}/admin/etudiants/${id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+    });
+    const data = await res.json();
+    showAlert(data.message, res.ok ? 'success' : 'danger');
+    if (res.ok) {
+        bootstrap.Modal.getInstance(document.getElementById('editStudentModal')).hide();
+        filterStudents();
+    }
+});
+
+async function deleteStudent(id) {
+    if (!confirm("Voulez-vous vraiment supprimer cet étudiant ?")) return;
+    const res = await apiFetch(`${API_URL}/admin/etudiants/${id}`, { method: 'DELETE' });
+    const data = await res.json();
+    showAlert(data.message, res.ok ? 'success' : 'danger');
+    if (res.ok) filterStudents();
+}
+
+
+// --- ENSEIGNANTS : Édition & Suppression ---
+function openEditTeacherModal(t) {
+    document.getElementById('editTcId').value = t.id;
+    document.getElementById('editTcNom').value = t.nom;
+    document.getElementById('editTcPrenom').value = t.prenom;
+    document.getElementById('editTcEmail').value = t.email;
+    new bootstrap.Modal(document.getElementById('editTeacherModal')).show();
+}
+
+document.getElementById('editTeacherForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const id = document.getElementById('editTcId').value;
+    const payload = {
+        nom: document.getElementById('editTcNom').value,
+        prenom: document.getElementById('editTcPrenom').value,
+        email: document.getElementById('editTcEmail').value
+    };
+
+    const res = await apiFetch(`${API_URL}/admin/enseignants/${id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+    });
+    const data = await res.json();
+    showAlert(data.message, res.ok ? 'success' : 'danger');
+    if (res.ok) {
+        bootstrap.Modal.getInstance(document.getElementById('editTeacherModal')).hide();
+        loadAdminTeachers();
+    }
+});
+
+async function deleteTeacher(id) {
+    if (!confirm("Voulez-vous vraiment supprimer cet enseignant ?")) return;
+    const res = await apiFetch(`${API_URL}/admin/enseignants/${id}`, { method: 'DELETE' });
+    const data = await res.json();
+    showAlert(data.message, res.ok ? 'success' : 'danger');
+    if (res.ok) loadAdminTeachers();
+}
+
+
+async function loadAdminGroupes() {
+    const niveau = document.getElementById('filterGrpNiveau').value;
+    const res = await apiFetch(`${API_URL}/admin/groupes?niveau=${encodeURIComponent(niveau)}`);
+    const data = await res.json();
+    const tbody = document.getElementById('adminGroupsTable');
+    tbody.innerHTML = '';
+
+    if (data.groupes.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="5" class="text-center text-muted">Aucun groupe formé pour le moment.</td></tr>`;
+        return;
+    }
+
+    data.groupes.forEach(g => {
+        const encadrant = g.enseignant_nom ? `${g.enseignant_nom} ${g.enseignant_prenom}` : '<span class="text-muted">Non assigné</span>';
+        const sujet = g.sujet_titre ? `<strong>${g.sujet_titre}</strong>` : '<span class="text-italic text-muted">Pas encore de sujet</span>';
+        
+        tbody.innerHTML += `
+            <tr>
+                <td>
+                    <span class="badge bg-primary">${g.niveau}</span><br>
+                    <small class="text-muted">${g.specialite}</small>
+                </td>
+                <td>${g.membres}</td>
+                <td>${encadrant}</td>
+                <td>
+                    ${sujet}<br>
+                    <span class="badge bg-secondary">${g.statut_sujet || 'En attente'}</span>
+                </td>
+                <td class="text-end">
+                    <button class="btn btn-danger btn-sm" onclick="deleteGroup(${g.id})">
+                        <i class="fas fa-trash me-1"></i>Supprimer
+                    </button>
+                </td>
+            </tr>
+        `;
+    });
+}
+
+async function deleteGroup(id) {
+    if (!confirm("Voulez-vous vraiment supprimer ce groupe ? Les étudiants membres seront libérés.")) return;
+    
+    const res = await apiFetch(`${API_URL}/admin/groupes/${id}`, { method: 'DELETE' });
+    const data = await res.json();
+    showAlert(data.message, res.ok ? 'success' : 'danger');
+    if (res.ok) {
+        loadAdminGroupes();
+    }
+}
+
+
+// --- ADMIN : Ajout Manuel d'un Étudiant ---
+document.getElementById('addStudentManualForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const payload = {
+        annee_universitaire: document.getElementById('manStYear').value,
+        niveau: document.getElementById('manStNiveau').value,
+        specialite: document.getElementById('manStSpec').value.trim(),
+        matricule: document.getElementById('manStMatricule').value.trim(),
+        nom: document.getElementById('manStNom').value.trim(),
+        prenom: document.getElementById('manStPrenom').value.trim(),
+        section: document.getElementById('manStSection').value.trim(),
+        groupe: document.getElementById('manStGroupe').value.trim()
+    };
+    try {
+        const res = await apiFetch(`${API_URL}/admin/etudiants/ajouter`, {
+            method: 'POST', headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'Erreur lors de l’ajout.');
+        showAlert(data.message, 'success');
+        document.getElementById('addStudentManualForm').reset();
+        filterStudents();
+    } catch (err) { showAlert(err.message, 'danger'); }
+});
+
+
+        // --- INSCRIPTION ---
+        document.getElementById('registerForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            try {
+                const payload = {
+                    username: document.getElementById('regUsername').value.trim(),
+                    email: document.getElementById('regEmail').value.trim(),
+                    nom: document.getElementById('regNom').value.trim(),
+                    prenom: document.getElementById('regPrenom').value.trim(),
+                    role: document.getElementById('regRole').value,
+                    matricule: document.getElementById('regMatricule').value.trim(),
+                    niveau: document.getElementById('regNiveau').value,
+                    specialite: document.getElementById('regSpecialite').value.trim()
+                };
+                const res = await apiFetch(`${API_URL}/auth/register`, {
+                    method: 'POST', headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                const data = await res.json();
+                if (!res.ok) throw new Error(data.error || 'Erreur lors de l’inscription.');
+                showAlert(data.message, 'success', 'authAlert');
+                document.getElementById('verifyEmailAddress').value = payload.email;
+                document.getElementById('tempUsername').value = payload.username;
+                document.getElementById('registerForm').reset();
+                toggleRegisterFields();
+            } catch (err) {
+                showAlert(err.message, 'danger', 'authAlert');
+            }
+        });
+
+        // --- ADMIN : COMPTES EN ATTENTE ---
+        async function loadPendingUsers() {
+            try {
+                const res = await apiFetch(`${API_URL}/admin/users/pending`);
+                const data = await res.json();
+                if (!res.ok) throw new Error(data.error || 'Impossible de charger les comptes.');
+                const tbody = document.getElementById('pendingUsersTable');
+                tbody.replaceChildren();
+                if (!data.users_pending || data.users_pending.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="4" class="text-center text-muted">Aucun compte en attente.</td></tr>';
+                    return;
+                }
+                data.users_pending.forEach(u => {
+                    const tr = document.createElement('tr');
+                    const identity = `${u.prenom} ${u.nom}`;
+                    [identity, u.role, `${u.email}${u.matricule ? ' / ' + u.matricule : ''} — ${u.email_verified ? 'e-mail vérifié' : 'e-mail non vérifié'}`].forEach(value => {
+                        const td = document.createElement('td');
+                        td.textContent = value || '';
+                        tr.appendChild(td);
+                    });
+                    const actions = document.createElement('td');
+                    actions.innerHTML = `
+                        <button class="btn btn-success btn-sm me-1" onclick="validateUser(${u.id}, 'approve')">Valider</button>
+                        <button class="btn btn-danger btn-sm" onclick="validateUser(${u.id}, 'reject')">Refuser</button>`;
+                    tr.appendChild(actions);
+                    tbody.appendChild(tr);
+                });
+            } catch (err) { showAlert(err.message, 'danger'); }
+        }
+
+        async function validateUser(id, action) {
+            try {
+                const res = await apiFetch(`${API_URL}/admin/users/${id}/validate`, {
+                    method: 'POST', headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ action })
+                });
+                const data = await res.json();
+                if (!res.ok) throw new Error(data.error || 'Erreur de validation.');
+                showAlert(data.message, 'success');
+                loadPendingUsers();
+            } catch (err) { showAlert(err.message, 'danger'); }
+        }
+
+        // --- AJOUT MANUEL D'UN ENSEIGNANT ---
+        document.getElementById('addTeacherManualForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const payload = {
+                annee_universitaire: document.getElementById('manTcYear').value,
+                nom: document.getElementById('manTcNom').value.trim(),
+                prenom: document.getElementById('manTcPrenom').value.trim(),
+                email: document.getElementById('manTcEmail').value.trim()
+            };
+            try {
+                const res = await apiFetch(`${API_URL}/admin/enseignants/ajouter`, {
+                    method: 'POST', headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                const data = await res.json();
+                if (!res.ok) throw new Error(data.error || 'Erreur lors de l’ajout.');
+                showAlert(data.message, 'success');
+                document.getElementById('addTeacherManualForm').reset();
+                loadAdminTeachers();
+            } catch (err) { showAlert(err.message, 'danger'); }
+        });
+
+        // --- ÉTUDIANT : CRÉATION DU GROUPE ---
+        document.getElementById('createGroupForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const members = document.getElementById('grpMembers').value
+                .split(',').map(value => value.trim()).filter(Boolean);
+            if (new Set(members).size !== members.length) {
+                showAlert('Un même matricule/identifiant ne peut apparaître deux fois.', 'danger');
+                return;
+            }
+            const formData = new FormData();
+            formData.append('annee_universitaire', document.getElementById('grpYear').value.trim());
+            formData.append('niveau', document.getElementById('grpNiveau').value);
+            formData.append('specialite', document.getElementById('grpSpec').value.trim());
+            formData.append('etudiants_ids', JSON.stringify(members));
+            formData.append('sujet_titre', document.getElementById('grpSubjectTitle').value.trim());
+            const fileInput = document.getElementById('grpSubjectFile');
+            if (fileInput.files[0]) formData.append('file', fileInput.files[0]);
+            try {
+                const res = await apiFetch(`${API_URL}/groupes/creer`, { method: 'POST', body: formData });
+                const data = await res.json();
+                if (!res.ok) throw new Error(data.error || 'Erreur lors de la création du groupe.');
+                showAlert(data.message, 'success');
+                document.getElementById('createGroupForm').reset();
+                fillGroupCreatorMatricule();
+                updateGroupRulesHint();
+                loadStudentGroups();
+            } catch (err) { showAlert(err.message, 'danger'); }
+        });
+
+        // --- ENSEIGNANT : QUOTAS ET SUJETS INTERNES ---
+        function fillTeacherQuotas() {
+            if (!currentUser || !currentUser.teacher_id) return;
+            document.getElementById('qL3').value = currentUser.max_groupes_l3 ?? 0;
+            document.getElementById('q4ING').value = currentUser.max_groupes_4ing ?? 0;
+            document.getElementById('qM2').value = currentUser.max_groupes_m2_5ing ?? 2;
+            document.getElementById('qM2Only').value = currentUser.max_groupes_m2 ?? 0;
+            document.getElementById('q5ING').value = currentUser.max_groupes_5ing ?? 0;
+            document.getElementById('qMixed').value = currentUser.max_groupes_m2_5ing_mixte ?? 0;
+        }
+
+        document.getElementById('teacherQuotasForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            if (!currentUser || !currentUser.teacher_id) {
+                showAlert('Aucun profil enseignant associé à ce compte.', 'danger');
+                return;
+            }
+            const payload = {
+                max_groupes_l3: document.getElementById('qL3').value,
+                max_groupes_4ing: document.getElementById('q4ING').value,
+                max_groupes_m2_5ing: document.getElementById('qM2').value,
+                max_groupes_m2: document.getElementById('qM2Only').value,
+                max_groupes_5ing: document.getElementById('q5ING').value,
+                max_groupes_m2_5ing_mixte: document.getElementById('qMixed').value
+            };
+            try {
+                const res = await apiFetch(`${API_URL}/enseignants/${currentUser.teacher_id}/quotas`, {
+                    method: 'POST', headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                const data = await res.json();
+                if (!res.ok) throw new Error(data.error || 'Erreur lors de la mise à jour des quotas.');
+                showAlert(data.message, 'success');
+                Object.assign(currentUser, {
+                    max_groupes_l3: Number(payload.max_groupes_l3),
+                    max_groupes_4ing: Number(payload.max_groupes_4ing),
+                    max_groupes_m2_5ing: Number(payload.max_groupes_m2_5ing),
+                    max_groupes_m2: Number(payload.max_groupes_m2), max_groupes_5ing: Number(payload.max_groupes_5ing), max_groupes_m2_5ing_mixte: Number(payload.max_groupes_m2_5ing_mixte)
+                });
+            } catch (err) { showAlert(err.message, 'danger'); }
+        });
+
+        document.getElementById('teacherSubjectForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            if (!currentUser || !currentUser.teacher_id) {
+                showAlert('Aucun profil enseignant associé à ce compte.', 'danger');
+                return;
+            }
+            const payload = {
+                annee_universitaire: document.getElementById('subYear').value.trim(),
+                enseignant_id: currentUser.teacher_id,
+                niveau: document.getElementById('subNiveau').value,
+                specialite: document.getElementById('subSpec').value.trim() || 'Toutes',
+                titre: document.getElementById('subTitle').value.trim(),
+                description: document.getElementById('subDesc').value.trim(),
+                capacite_max: document.getElementById('subCapacity').value
+            };
+            try {
+                const res = await apiFetch(`${API_URL}/enseignants/sujets/creer`, {
+                    method: 'POST', headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                const data = await res.json();
+                if (!res.ok) throw new Error(data.error || 'Erreur lors de la création du sujet.');
+                showAlert(data.message, 'success');
+                document.getElementById('teacherSubjectForm').reset();
+            } catch (err) { showAlert(err.message, 'danger'); }
+        });
+
+        // --- VALIDATEUR : CONSULTATION ET ARBITRAGE ---
+        
+async function loadValidatorSubjects() {
+    try {
+        const res = await apiFetch(`${API_URL}/validateur/sujets-externes/attente`);
+        const data = await res.json();
+
+        if (!res.ok) {
+            throw new Error(data.error || 'Erreur de chargement.');
+        }
+
+        const tbody = document.getElementById('validatorTable');
+        tbody.replaceChildren();
+
+        if (!data.sujets_externes || data.sujets_externes.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="5" class="text-center text-muted">Aucun sujet externe à examiner.</td></tr>';
+            return;
+        }
+
+        data.sujets_externes.forEach(s => {
+            const tr = document.createElement('tr');
+
+            const cells = [
+                `${s.niveau} / ${s.specialite}`,
+                `${s.chef_prenom || ''} ${s.chef_nom || ''} (${s.chef_matricule || ''})`,
+                `${s.sujet_titre || 'Sans titre'} (avis : ${s.nb_avis || 0}/2${s.nb_avis >= 2 ? ' — arbitrage requis si désaccord' : ''})`
+            ];
+
+            cells.forEach(value => {
+                const td = document.createElement('td');
+                td.textContent = value;
+                tr.appendChild(td);
+            });
+
+            // Consultation sécurisée du fichier
+            const doc = document.createElement('td');
+
+            if (s.sujet_description_path) {
+                const link = document.createElement('a');
+
+                link.href = '#';
+                link.textContent = 'Consulter';
+
+                link.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    openValidatorSubjectFile(s.groupe_id);
+                });
+
+                doc.appendChild(link);
+            } else {
+                doc.textContent = 'Aucun fichier';
+            }
+
+            tr.appendChild(doc);
+
+            // Actions de validation
+            const actions = document.createElement('td');
+
+            actions.innerHTML = `
+                <button class="btn btn-success btn-sm me-1"
+                    onclick="arbitrateSubject(${s.groupe_id}, 'valider')">
+                    Valider
+                </button>
+
+                <button class="btn btn-danger btn-sm"
+                    onclick="arbitrateSubject(${s.groupe_id}, 'rejeter')">
+                    Rejeter
+                </button>
+            `;
+
+            tr.appendChild(actions);
+            tbody.appendChild(tr);
+        });
+
+    } catch (err) {
+        showAlert(err.message, 'danger');
+    }
+}
+
+
+// Ouverture sécurisée du fichier du sujet externe
+async function openValidatorSubjectFile(groupeId) {
+    const fileWindow = window.open('about:blank', '_blank');
+
+    try {
+        const res = await apiFetch(
+            `${API_URL}/groupes/${groupeId}/fichier-sujet`
+        );
+
+        if (!res.ok) {
+            let message = 'Impossible de consulter le document.';
+
+            try {
+                const data = await res.json();
+                message = data.error || message;
+            } catch (e) {}
+
+            throw new Error(message);
+        }
+
+        const blob = await res.blob();
+        const fileUrl = URL.createObjectURL(blob);
+
+        if (fileWindow) {
+            fileWindow.location.href = fileUrl;
+        } else {
+            const link = document.createElement('a');
+            link.href = fileUrl;
+            link.target = '_blank';
+            link.click();
+        }
+
+        // Libérer l'URL temporaire après un délai
+        setTimeout(() => URL.revokeObjectURL(fileUrl), 60000);
+
+    } catch (err) {
+        if (fileWindow) fileWindow.close();
+        showAlert(err.message, 'danger');
+    }
+}
+
+
+        async function arbitrateSubject(id, action) {
+            if (!confirm(`Confirmer votre décision : ${action} ?`)) return;
+            try {
+                const res = await apiFetch(`${API_URL}/validateur/sujets-externes/${id}/arbitrage`, {
+                    method: 'POST', headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ action, validator_id: currentUser ? currentUser.teacher_id : null })
+                });
+                const data = await res.json();
+                if (!res.ok) throw new Error(data.error || 'Erreur lors de l’arbitrage.');
+                showAlert(data.message, 'success');
+                loadValidatorSubjects();
+            } catch (err) { showAlert(err.message, 'danger'); }
+        }
+
+    </script>
+</body>
+</html>
