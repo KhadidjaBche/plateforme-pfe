@@ -1,6 +1,6 @@
 require('dotenv').config();
 const express = require('express');
-const sqlite3 = require('sqlite3').verbose();
+const Database = require('better-sqlite3');
 const cors = require('cors');
 const path = require('path');
 const multer = require('multer'); // Gestionnaire de téléchargement de fichiers
@@ -138,14 +138,25 @@ const uploadSujet = multer({
 // ==========================================
 // INITIALISATION DE LA BASE DE DONNÉES
 // ==========================================
+//const dbPath = path.resolve(__dirname, 'database.sqlite');
+//const db = new Database(dbPath, (err) => {
+//    if (err) {
+//        console.error('Erreur de connexion à la base de données :', err.message);
+//    } else {
+//        console.log('Connecté à la base de données SQLite avec succès.');
+//    }
+//});
+
+// INITIALISATION DE LA BASE DE DONNÉES
+// ==========================================
 const dbPath = path.resolve(__dirname, 'database.sqlite');
-const db = new sqlite3.Database(dbPath, (err) => {
-    if (err) {
-        console.error('Erreur de connexion à la base de données :', err.message);
-    } else {
-        console.log('Connecté à la base de données SQLite avec succès.');
-    }
-});
+
+// Avec better-sqlite3, la connexion est synchrone (pas de callback 'err')
+const db = new Database(dbPath);
+
+console.log('Connecté à la base de données SQLite avec succès.');
+
+module.exports = db;
 
 // ==========================================
 // CRÉATION DES TABLES (Cahier des charges)
