@@ -1211,14 +1211,24 @@ function runSchemaMigrations(index=0) {
     });
   }
   const [table,column,definition] = schemaMigrations[index];
-  db.all(`PRAGMA table_info(${table})`, [], (err, cols) => {
-    if (err) return console.error(`Migration ${table}.${column}:`,err.message);
-    if (cols.some(c=>c.name===column)) return runSchemaMigrations(index+1);
-    db.run(`ALTER TABLE ${table} ADD COLUMN ${column} ${definition}`, e => {
-      if (e) console.error(`Migration ${table}.${column}:`,e.message);
-      runSchemaMigrations(index+1);
-    });
-  });
+  // Migration synchrone avec better-sqlite3
+try {
+    // Récupération directe des colonnes de la table
+    const cols = db.prepare(`PRAGMA table_info(${table})`).all();
+    
+    // Vérification si la colonne existe déjà
+    const columnExists = cols.some(c => c.name === column);
+    
+    if (!columnExists) {
+        // Ajout de la colonne si elle n'existe pas
+        db.prepare(`ALTER TABLE ${table} ADD COLUMN ${column} ${definition}`).run();
+    }
+} catch (e) {
+    console.error(`Migration ${table}.${column}:`, e.message);
+}
+
+// Appel de la suite des migrations (si tu es dans une fonction de boucle)
+runSchemaMigrations(index + 1);
 }
 function createFeatureTables() {
   db.serialize(() => {
